@@ -212,31 +212,6 @@ class SimpleImage {
   }
 
   /**
-   * Read pasted image and convert it to base64
-   *
-   * @static
-   * @param {File} file
-   * @returns {Promise<SimpleImageData>}
-   */
-  onDropHandler(file) {
-    const reader = new FileReader();
-
-    reader.readAsDataURL(file);
-
-    return new Promise(resolve => {
-      reader.onload = (event) => {
-        const url =  event.target.result;
-        //this.url = url;
-
-        resolve({
-          url: url,
-          caption: file.name
-        });
-      };
-    });
-  }
-
-  /**
    * On paste callback that is fired from Editor.
    *
    * @param {PasteEvent} event - event with pasted config
@@ -262,11 +237,10 @@ class SimpleImage {
 
       case 'file':
         const { file } = event.detail;
-
-        this.onDropHandler(file)
-          .then(data => {
-            this.data = data;
-          });
+        this.data = {
+          url: URL.createObjectURL(file),
+          caption: file.name
+        };
 
         break;
     }
