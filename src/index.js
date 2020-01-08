@@ -24,7 +24,7 @@ class SimpleImage {
    *   config - user config for Tool
    *   api - Editor.js API
    */
-  constructor({data, config, api}) {
+  constructor({ data, config, api }) {
     /**
      * Editor.js API
      */
@@ -97,8 +97,16 @@ class SimpleImage {
     ];
   }
 
+  static get toolbox() {
+    return {
+      title: 'Image',
+      icon: '<svg width="17" height="15" viewBox="0 0 336 276" xmlns="http://www.w3.org/2000/svg"><path d="M291 150V79c0-19-15-34-34-34H79c-19 0-34 15-34 34v42l67-44 81 72 56-29 42 30zm0 52l-43-30-56 30-81-67-66 39v23c0 19 15 34 34 34h178c17 0 31-13 34-29zM79 0h178c44 0 79 35 79 79v118c0 44-35 79-79 79H79c-44 0-79-35-79-79V79C0 35 35 0 79 0z"/></svg>'
+    };
+  }
+
   /**
    * Creates a Block:
+   *  0) Show a button if there is no image
    *  1) Show preloader
    *  2) Start to load an image
    *  3) After loading, append image and caption input
@@ -106,6 +114,9 @@ class SimpleImage {
    */
   render() {
     let wrapper = this._make('div', [this.CSS.baseClass, this.CSS.wrapper]),
+      loadButton = this._make('input', [], {
+        type: 'file'
+      }),
       loader = this._make('div', this.CSS.loading),
       imageHolder = this._make('div', this.CSS.imageHolder),
       image = this._make('img'),
@@ -114,13 +125,13 @@ class SimpleImage {
         innerHTML: this.data.caption || ''
       });
 
+    this.nodes.imageHolder = imageHolder;
+    this.nodes.wrapper = wrapper;
+    this.nodes.image = image;
+    this.nodes.caption = caption;
+    this.nodes.loader = loader;
+
     caption.dataset.placeholder = 'Enter a caption';
-
-    wrapper.appendChild(loader);
-
-    if (this.data.url) {
-      image.src = this.data.url;
-    }
 
     image.onload = () => {
       wrapper.classList.remove(this.CSS.loading);
@@ -128,6 +139,13 @@ class SimpleImage {
       wrapper.appendChild(imageHolder);
       wrapper.appendChild(caption);
       loader.remove();
+
+      if (loadButton !== null) {
+        loadButton.remove();
+        loadButton = null;
+      }
+
+      this.nodes.loader = null;
       this._acceptTuneView();
     };
 
@@ -136,10 +154,24 @@ class SimpleImage {
       console.log('Failed to load an image', e);
     };
 
-    this.nodes.imageHolder = imageHolder;
-    this.nodes.wrapper = wrapper;
-    this.nodes.image = image;
-    this.nodes.caption = caption;
+    if (this.data.url) {
+      wrapper.appendChild(loader);
+      image.src = this.data.url;    }
+    else {
+      wrapper.appendChild(loadButton);
+      loadButton.onchange = (e) => {
+        const file = e.target.files[0];
+        const url = URL.createObjectURL(file);
+        
+        this.data = {
+          url: url,
+          caption: file.name
+        };
+      
+        loadButton.remove();
+        loadButton = null;
+      };
+    }
 
     return wrapper;
   }
@@ -193,8 +225,11 @@ class SimpleImage {
 
     return new Promise(resolve => {
       reader.onload = (event) => {
+        const url =  event.target.result;
+        //this.url = url;
+
         resolve({
-          url: event.target.result,
+          url: url,
           caption: file.name
         });
       };
@@ -214,10 +249,11 @@ class SimpleImage {
         this.data = {
           url: img.src,
         };
+
         break;
 
       case 'pattern':
-        const {data: text} = event.detail;
+        const { data: text } = event.detail;
 
         this.data = {
           url: text,
@@ -225,7 +261,7 @@ class SimpleImage {
         break;
 
       case 'file':
-        const {file} = event.detail;
+        const { file } = event.detail;
 
         this.onDropHandler(file)
           .then(data => {
@@ -271,9 +307,9 @@ class SimpleImage {
       patterns: {
         image: /https?:\/\/\S+\.(gif|jpe?g|tiff|png)$/i
       },
-      tags: [ 'img' ],
+      tags: ['img'],
       files: {
-        mimeTypes: [ 'image/*' ]
+        mimeTypes: ['image/*']
       },
     };
   }
@@ -285,7 +321,7 @@ class SimpleImage {
   renderSettings() {
     let wrapper = document.createElement('div');
 
-    this.settings.forEach( tune => {
+    this.settings.forEach(tune => {
       let el = document.createElement('div');
 
       el.classList.add(this.CSS.settingsButton);
@@ -314,9 +350,9 @@ class SimpleImage {
   _make(tagName, classNames = null, attributes = {}) {
     let el = document.createElement(tagName);
 
-    if ( Array.isArray(classNames) ) {
+    if (Array.isArray(classNames)) {
       el.classList.add(...classNames);
-    } else if( classNames ) {
+    } else if (classNames) {
       el.classList.add(classNames);
     }
 
@@ -341,7 +377,7 @@ class SimpleImage {
    * @private
    */
   _acceptTuneView() {
-    this.settings.forEach( tune => {
+    this.settings.forEach(tune => {
       this.nodes.imageHolder.classList.toggle(this.CSS.imageHolder + '--' + tune.name.replace(/([A-Z])/g, (g) => `-${g[0].toLowerCase()}`), !!this.data[tune.name]);
 
       if (tune.name === 'stretched') {
