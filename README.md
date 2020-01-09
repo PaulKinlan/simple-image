@@ -1,4 +1,5 @@
-![](https://badgen.net/badge/Editor.js/v2.0/blue)
+Note: This is a fork of the SimpleImage repository. It adds in extra functionality such as a toolbar to add images (rather than just drag and drop) and uses blob URL's
+to improve memory usage.
 
 # Simple Image Tool
 
@@ -15,13 +16,13 @@ Works only with pasted image URLs and requires no server-side uploader.
 Get the package
 
 ```shell
-npm i --save-dev @editorjs/simple-image
+npm i --save-dev simple-image-editorjs
 ```
 
 Include module at your application
 
 ```javascript
-const SimpleImage = require('@editorjs/simple-image');
+const SimpleImage = require('simple-image-editorjs');
 ```
 
 ### Download to your project's source dir
@@ -31,9 +32,9 @@ const SimpleImage = require('@editorjs/simple-image');
 
 ### Load from CDN
 
-You can load specific version of package from [jsDelivr CDN](https://www.jsdelivr.com/package/npm/@editor/simple-image).
+You can load specific version of package from [jsDelivr CDN](https://www.jsdelivr.com/package/npm/simple-image-editorjs).
 
-`https://cdn.jsdelivr.net/npm/@editorjs/simple-image@latest`
+`https://cdn.jsdelivr.net/npm/simple-image-editorjs@latest`
 
 Then require this script on page with Editor.js.
 
