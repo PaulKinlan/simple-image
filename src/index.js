@@ -130,6 +130,7 @@ class SimpleImage {
     this.nodes.image = image;
     this.nodes.caption = caption;
     this.nodes.loader = loader;
+    this.nodes.loadButton = loadButton;
 
     caption.dataset.placeholder = 'Enter a caption';
 
@@ -159,6 +160,7 @@ class SimpleImage {
       image.src = this.data.url;    }
     else {
       wrapper.appendChild(loadButton);
+
       loadButton.onchange = (e) => {
         const file = e.target.files[0];
         const url = URL.createObjectURL(file);
@@ -241,9 +243,11 @@ class SimpleImage {
           url: URL.createObjectURL(file),
           caption: file.name
         };
-
         break;
     }
+
+    this.nodes.loadButton.remove();
+    this.nodes.loadButton = null;
   }
 
   /**
@@ -318,7 +322,7 @@ class SimpleImage {
       URL.revokeObjectURL(this.data.url);
     }
   }
-
+  
   /**
    * Helper for making Elements with attributes
    *
