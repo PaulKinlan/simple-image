@@ -77,7 +77,7 @@ class SimpleImage {
       withBackground: data.withBackground !== undefined ? data.withBackground : false,
       stretched: data.stretched !== undefined ? data.stretched : false,
     };
-
+ 
     /**
      * Available Image settings
      */
@@ -312,6 +312,12 @@ class SimpleImage {
     });
     return wrapper;
   };
+
+  removed() {
+    if (this.data.url && this.data.url.startsWith('blob:')) {
+      URL.revokeObjectURL(this.data.url);
+    }
+  }
 
   /**
    * Helper for making Elements with attributes
